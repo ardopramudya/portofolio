@@ -1,0 +1,16 @@
+export interface Certification {
+  number: string;
+  title: string;
+  issuer: string;
+  year: string;
+  href?: string;
+}
+
+// File ini digenerate otomatis oleh admin panel. Jangan edit manual.
+export const certifications: Certification[] = [
+  {"number":"01","title":"Belajar Dasar Pemrograman Web","issuer":"Dicoding Indonesia","year":"2026","href":"/certificates/sertifikat_course_123_602340_230826220442.pdf"},
+  {"number":"02","title":"Belajar Membuat Front-End Web untuk Pemula","issuer":"Dicoding Indonesia","year":"2026","href":"/certificates/sertifikat_course_256_602340_050826212652.pdf"},
+  {"number":"03","title":"Belajar Dasar Pemrograman JavaScript","issuer":"Dicoding Indonesia","year":"2026","href":"/certificates/sertifikat_course_315_602340_050826212726.pdf"},
+  {"number":"04","title":"Belajar Dasar AI","issuer":"Dicoding Indonesia","year":"2026","href":"/certificates/sertifikat_course_600_602340_090826213535.pdf"},
+  {"number":"05","title":"Memulai Pemrograman dengan Python","issuer":"Dicoding Indonesia","year":"2026","href":"/certificates/sertifikat_course_653_602340_070826130946.pdf"},
+];

@@ -1,0 +1,104 @@
+{
+  "components\\About.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\About.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Achievements.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Achievements.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\AnimatedBackground.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\AnimatedBackground.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Certifications.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Certifications.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Contact.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Contact.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Education.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Education.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Experience.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Experience.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Footer.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Footer.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Hero.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Hero.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\ProjectCard.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\ProjectCard.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\ScrollProgress.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\ScrollProgress.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\ScrollRevealFx.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\ScrollRevealFx.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\ScrollSectionFade.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\ScrollSectionFade.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Services.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Services.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\Skills.tsx -> gsap/ScrollTrigger": {
+    "id": "components\\Skills.tsx -> gsap/ScrollTrigger",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
+    ]
+  },
+  "components\\SmoothScroll.tsx -> @studio-freight/lenis": {
+    "id": "components\\SmoothScroll.tsx -> @studio-freight/lenis",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_studio-freight_lenis_dist_lenis_mjs.js"
+    ]
+  },
+  "components\\SmoothScroll.tsx -> lenis": {
+    "id": "components\\SmoothScroll.tsx -> lenis",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_lenis_dist_lenis_mjs.js"
+    ]
+  }
+}
