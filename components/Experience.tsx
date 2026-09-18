@@ -7,7 +7,25 @@ import type { ExperienceItem } from "@/data/experience";
 
 export default function Experience() {
   const ref = useRef<HTMLElement>(null);
+  const [list, setList] = useState<ExperienceItem[]>(experiences);
   const [activeCert, setActiveCert] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/experience", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        if (cancelled) return;
+        const arr = Array.isArray(data) && data.length ? (data as ExperienceItem[]) : experiences;
+        setList(arr);
+      })
+      .catch(() => {
+        /* pakai data statis */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -54,7 +72,7 @@ export default function Experience() {
         </p>
 
         <div className="exp-list mt-10 space-y-0">
-          {experiences.map((item: ExperienceItem) => {
+          {list.map((item: ExperienceItem) => {
             const hasCert = Boolean(item.certificate?.href);
             const isOpen = activeCert === item.number;
 

@@ -93,16 +93,19 @@ export default function About() {
                   backgroundImage: `repeating-linear-gradient(0deg, transparent 0 28px, rgba(255,255,255,0.6) 28px 29px)`,
                 }}
               />
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-                <div className="h-20 w-20 md:h-24 md:w-24 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center">
-                  <span className="font-display text-[28px] md:text-[32px] font-bold tracking-[-0.04em] text-white/70">
-                    B
-                  </span>
-                </div>
-                <p className="mt-5 text-[11px] tracking-[0.2em] text-white/30 font-medium">
+              <img
+                src="/foto.png"
+                alt="Bernardo Pramudya Ananta"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-left">
+                <p className="text-[11px] tracking-[0.2em] text-white/80 font-medium">
                   BERNARDO PRAMUDYA ANANTA
                 </p>
-                <p className="mt-1 text-[12px] tracking-wide text-white/40">S1 Teknik Informatika</p>
+                <p className="mt-1 text-[12px] tracking-wide text-white/60">
+                  Front-End Developer & QA
+                </p>
               </div>
               <div className="pointer-events-none absolute inset-0 rounded-[24px] ring-1 ring-white/[0.04]" />
             </div>
@@ -115,7 +118,7 @@ export default function About() {
               <div className="rounded-2xl bg-[#141414] border border-white/[0.06] px-5 py-4">
                 <p className="text-[10px] tracking-[0.16em] text-white/30">ROLE</p>
                 <p className="mt-1 text-[13px] font-medium text-white leading-tight">
-                  Full-Stack / Web Developer
+                  Front-End Developer & QA
                 </p>
               </div>
             </div>
@@ -132,8 +135,12 @@ export default function About() {
             </h2>
 
             <p className="about-copy mt-6 text-[17px] md:text-[19px] leading-relaxed text-white/85">
-              Fresh graduate Teknik Informatika with a strong interest in web development, software
-              engineering, and digital systems.
+              Informatics graduate with experience in developing web applications using React.js and
+              Laravel. Skilled in building responsive user interfaces, developing backend systems,
+              optimizing website performance, and conducting software testing to ensure functionality
+              and reliability. Familiar with functional testing, bug identification, and User Acceptance
+              Testing (UAT). Passionate about creating efficient, user-friendly, and reliable digital
+              solutions.
             </p>
             <div className="about-copy-wrap mt-5 space-y-4 text-[14px] md:text-[15px] leading-relaxed text-white/50 max-w-[56ch]">
               <p className="about-copy">

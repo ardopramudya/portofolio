@@ -125,8 +125,9 @@ export default function Hero() {
 
         <div className="mt-8 md:mt-10 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <p className="hero-fade max-w-[560px] text-[15px] md:text-[16px] leading-relaxed text-white/60">
-            Fresh Graduate in Informatics Engineering focused on building modern web applications,
-            digital systems, and creative solutions.
+            Informatics graduate with experience in developing web applications using React.js and
+            Laravel. Skilled in responsive UI, backend systems, performance optimization, and software
+            testing — including functional testing, bug identification, and UAT.
           </p>
 
           <div className="hero-fade flex flex-col sm:flex-row items-start sm:items-center gap-3">

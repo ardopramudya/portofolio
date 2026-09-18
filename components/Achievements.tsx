@@ -7,7 +7,25 @@ import type { Achievement } from "@/data/achievements";
 
 export default function Achievements() {
   const ref = useRef<HTMLElement>(null);
+  const [list, setList] = useState<Achievement[]>(achievements);
   const [active, setActive] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/achievements", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        if (cancelled) return;
+        const arr = Array.isArray(data) && data.length ? (data as Achievement[]) : achievements;
+        setList(arr);
+      })
+      .catch(() => {
+        /* pakai data statis */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -52,7 +70,7 @@ export default function Achievements() {
         </p>
 
         <div className="ach-grid mt-10 space-y-6">
-          {achievements.map((a: Achievement) => {
+          {list.map((a: Achievement) => {
             const hasCert = Boolean(a.certificate?.href);
             const isOpen = active === a.number;
             const href = a.certificate?.href ?? "";

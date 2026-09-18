@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { isAdminRequest } from "@/lib/auth";
+import { isAdminRequest } from "@/lib/serverAuth";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ ok: isAdminRequest() });
+  return NextResponse.json({ ok: await isAdminRequest() });
 }

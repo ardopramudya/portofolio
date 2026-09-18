@@ -1,65 +1,223 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Download, ExternalLink, Lock, LogOut, Plus, Pencil, Trash2, X } from "lucide-react";
-import type { Certification } from "@/data/certifications";
+import { SECTIONS, SECTION_KEYS, type Section } from "@/lib/sections";
 
 type AuthState = "loading" | "login" | "ready";
+type Item = Record<string, unknown>;
+type FieldType = "text" | "textarea";
 
-interface FormState {
-  number: string;
-  title: string;
-  issuer: string;
-  year: string;
-}
-
-const emptyForm: FormState = { number: "", title: "", issuer: "", year: "" };
-
-function nextNumberOf(list: Certification[]) {
-  const max = list.reduce((acc, c) => {
-    const n = parseInt(c.number, 10);
-    return Number.isFinite(n) ? Math.max(acc, n) : acc;
-  }, 0);
-  return String(max + 1).padStart(2, "0");
-}
+const FIELD_TYPE: Record<string, FieldType> = {
+  description: "textarea",
+};
 
 const inputCls =
   "w-full rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2.5 text-sm text-white placeholder:text-white/30 outline-none transition focus:border-white/40 focus:bg-white/[0.06]";
 
 const labelCls = "block text-[10px] tracking-[0.16em] text-white/40 font-medium mb-1.5 uppercase";
 
+function text(item: Item, key: string) {
+  const v = item[key];
+  return typeof v === "string" ? v : "";
+}
+
+function docHref(section: Section, item: Item) {
+  if (!SECTIONS[section].hasCertificate) return text(item, "href");
+  const cert = item.certificate;
+  if (cert && typeof cert === "object") return text(cert as Item, "href");
+  return "";
+}
+
+function docLabelOf(section: Section, item: Item) {
+  const cert = item.certificate;
+  if (cert && typeof cert === "object") return text(cert as Item, "label");
+  return "";
+}
+
+function nextNumberOf(items: Item[]) {
+  const max = items.reduce((acc, c) => {
+    const n = parseInt(text(c, "number"), 10);
+    return Number.isFinite(n) ? Math.max(acc, n) : acc;
+  }, 0);
+  return String(max + 1).padStart(2, "0");
+}
+
+function summaryOf(section: Section, item: Item) {
+  switch (section) {
+    case "certifications":
+      return { primary: text(item, "title"), secondary: `${text(item, "issuer")} · ${text(item, "year")}` };
+    case "experience":
+      return { primary: text(item, "role"), secondary: `${text(item, "company")} · ${text(item, "year")}` };
+    case "achievements":
+      return {
+        primary: text(item, "title"),
+        secondary: `${text(item, "tag")} · ${text(item, "event")} · ${text(item, "year")}`,
+      };
+  }
+}
+
+function Field({
+  field,
+  value,
+  onChange,
+}: {
+  field: { key: string; label: string };
+  value: string;
+  onChange: (key: string, value: string) => void;
+}) {
+  const type = FIELD_TYPE[field.key] ?? "text";
+  return (
+    <div>
+      <label className={labelCls}>{field.label}</label>
+      {type === "textarea" ? (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(field.key, e.target.value)}
+          rows={4}
+          className={`${inputCls} resize-none`}
+        />
+      ) : (
+        <input
+          value={value}
+          onChange={(e) => onChange(field.key, e.target.value)}
+          className={inputCls}
+        />
+      )}
+    </div>
+  );
+}
+
+function DocPicker({
+  section,
+  file,
+  setFile,
+  docLabel,
+  setDocLabel,
+  manualHref,
+  setManualHref,
+}: {
+  section: Section;
+  file: File | null;
+  setFile: (f: File | null) => void;
+  docLabel: string;
+  setDocLabel: (v: string) => void;
+  manualHref: string;
+  setManualHref: (v: string) => void;
+}) {
+  const def = SECTIONS[section];
+  const multiple = def.format === "pdf-image";
+  const accept = multiple ? ".pdf,.png,.jpg,.jpeg,.webp,.gif" : ".pdf";
+  return (
+    <div className="space-y-3">
+      <div>
+        <label className={labelCls}>{def.hasCertificate ? "File Sertifikat (opsional)" : "File PDF"}</label>
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 bg-white/[0.03] px-4 py-5 text-center hover:border-white/40 transition">
+          <Download size={18} className="text-white/60" />
+          <span className="text-xs text-white/60">
+            {file ? file.name : "Klik untuk pilih file (PDF / gambar)"}
+          </span>
+          <span className="text-[10px] tracking-wide text-white/30">maks. 20MB</span>
+          <input
+            type="file"
+            accept={accept}
+            className="hidden"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </label>
+      </div>
+
+      {def.hasCertificate && (
+        <div>
+          <label className={labelCls}>Label Sertifikat</label>
+          <input
+            value={docLabel}
+            onChange={(e) => setDocLabel(e.target.value)}
+            placeholder="E-Sertifikat Finalis…"
+            className={inputCls}
+          />
+        </div>
+      )}
+
+      <div>
+        <label className={labelCls}>Tautan Manual (opsional)</label>
+        <input
+          value={manualHref}
+          onChange={(e) => setManualHref(e.target.value)}
+          placeholder="/certificates/nama.pdf atau https://…"
+          className={inputCls}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [auth, setAuth] = useState<AuthState>("loading");
+  const [mode, setMode] = useState<"supabase" | "local">("local");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const [list, setList] = useState<Certification[]>([]);
-  const [form, setForm] = useState<FormState>(emptyForm);
+  const [active, setActive] = useState<Section>("certifications");
+  const [items, setItems] = useState<Item[]>([]);
+  const [form, setForm] = useState<Record<string, string>>({});
   const [file, setFile] = useState<File | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<FormState>(emptyForm);
+  const [docLabel, setDocLabel] = useState("");
+  const [manualHref, setManualHref] = useState("");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Record<string, string>>({});
   const [editFile, setEditFile] = useState<File | null>(null);
+  const [editDocLabel, setEditDocLabel] = useState("");
+  const [editManualHref, setEditManualHref] = useState("");
+  const [removeDoc, setRemoveDoc] = useState(false);
 
-  const loadList = async () => {
+  const def = SECTIONS[active];
+  const totalDocs = useMemo(
+    () => items.filter((c) => docHref(active, c)).length,
+    [items, active]
+  );
+
+  const loadList = useCallback(async (section: Section) => {
     try {
-      const res = await fetch("/api/certifications", { cache: "no-store" });
-      if (res.ok) setList(await res.json());
+      const res = await fetch(`/api/${section}`, { cache: "no-store" });
+      if (res.ok) setItems(await res.json());
     } catch {
       // jaringan bermasalah
     }
-  };
+  }, []);
 
   useEffect(() => {
+    fetch("/api/admin/config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.mode === "supabase") setMode("supabase");
+      })
+      .catch(() => {});
     fetch("/api/admin/check")
       .then((r) => r.json())
       .then((d) => {
         setAuth(d.ok ? "ready" : "login");
-        if (d.ok) return loadList();
+        if (d.ok) return loadList(active);
       })
       .catch(() => setAuth("login"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const switchSection = (section: Section) => {
+    setActive(section);
+    resetForm();
+    setEditing(null);
+    loadList(section);
+  };
+
+  const resetForm = () => {
+    setForm({});
+    setFile(null);
+    setDocLabel("");
+    setManualHref("");
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +227,7 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify(mode === "supabase" ? { email, password } : { password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -77,8 +235,9 @@ export default function AdminPage() {
         return;
       }
       setAuth("ready");
+      setEmail("");
       setPassword("");
-      await loadList();
+      await loadList(active);
     } catch {
       setError("Terjadi kesalahan jaringan.");
     } finally {
@@ -89,7 +248,7 @@ export default function AdminPage() {
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     setAuth("login");
-    setList([]);
+    setItems([]);
   };
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -98,20 +257,24 @@ export default function AdminPage() {
     setError("");
     try {
       const fd = new FormData();
-      fd.append("number", form.number || nextNumberOf(list));
-      fd.append("title", form.title);
-      fd.append("issuer", form.issuer);
-      fd.append("year", form.year);
+      const number = form.number?.trim() || nextNumberOf(items);
+      fd.append("number", number);
+      for (const f of def.fields) {
+        if (f.key !== "number" && form[f.key]?.trim()) fd.append(f.key, form[f.key].trim());
+      }
       if (file) fd.append("file", file);
-      const res = await fetch("/api/certifications", { method: "POST", body: fd });
+      if (docLabel.trim()) fd.append("docLabel", docLabel.trim());
+      if (manualHref.trim()) fd.append("manualHref", manualHref.trim());
+
+      const res = await fetch(`/api/${active}`, { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Gagal menambahkan.");
         return;
       }
-      setFile(null);
-      setForm({ ...emptyForm, number: nextNumberOf([...list, data.item]) });
-      await loadList();
+      resetForm();
+      setForm({ number: nextNumberOf([...items, data.item]) });
+      await loadList(active);
     } catch {
       setError("Terjadi kesalahan jaringan.");
     } finally {
@@ -119,31 +282,42 @@ export default function AdminPage() {
     }
   };
 
-  const startEdit = (item: Certification) => {
-    setEditingId(item.number);
-    setEditForm({ number: item.number, title: item.title, issuer: item.issuer, year: item.year });
+  const startEdit = (item: Item) => {
+    const initial: Record<string, string> = {};
+    for (const f of def.fields) {
+      const v = text(item, f.key);
+      if (v) initial[f.key] = v;
+    }
+    setEditing(text(item, "number"));
+    setEditForm(initial);
     setEditFile(null);
+    setEditDocLabel(docLabelOf(active, item));
+    setEditManualHref("");
+    setRemoveDoc(false);
   };
 
-  const handleSaveEdit = async (number: string, e: React.FormEvent) => {
+  const handleSaveEdit = async (id: string, e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     setError("");
     try {
       const fd = new FormData();
-      fd.append("number", editForm.number);
-      fd.append("title", editForm.title);
-      fd.append("issuer", editForm.issuer);
-      fd.append("year", editForm.year);
+      for (const f of def.fields) {
+        if (editForm[f.key]?.trim()) fd.append(f.key, editForm[f.key].trim());
+      }
       if (editFile) fd.append("file", editFile);
-      const res = await fetch(`/api/certifications/${number}`, { method: "PATCH", body: fd });
+      if (editDocLabel.trim()) fd.append("docLabel", editDocLabel.trim());
+      if (editManualHref.trim()) fd.append("manualHref", editManualHref.trim());
+      if (removeDoc) fd.append("removeDoc", "1");
+
+      const res = await fetch(`/api/${active}/${id}`, { method: "PATCH", body: fd });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Gagal menyimpan.");
         return;
       }
-      setEditingId(null);
-      await loadList();
+      setEditing(null);
+      await loadList(active);
     } catch {
       setError("Terjadi kesalahan jaringan.");
     } finally {
@@ -151,26 +325,26 @@ export default function AdminPage() {
     }
   };
 
-  const handleDelete = async (item: Certification) => {
-    if (!confirm(`Hapus sertifikat "${item.title}"? File PDF ikut dihapus.`)) return;
+  const handleDelete = async (item: Item) => {
+    if (!confirm(`Hapus data "${text(item, "title") || text(item, "role")}"? File ikut dihapus.`)) {
+      return;
+    }
     setBusy(true);
     setError("");
     try {
-      const res = await fetch(`/api/certifications/${item.number}`, { method: "DELETE" });
+      const res = await fetch(`/api/${active}/${text(item, "number")}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json();
         setError(data.error || "Gagal menghapus.");
         return;
       }
-      await loadList();
+      await loadList(active);
     } catch {
       setError("Terjadi kesalahan jaringan.");
     } finally {
       setBusy(false);
     }
   };
-
-  const totalPdf = useMemo(() => list.filter((c) => c.href).length, [list]);
 
   if (auth === "loading") {
     return (
@@ -192,10 +366,25 @@ export default function AdminPage() {
               <h1 className="font-display text-lg font-bold tracking-[-0.03em] text-white">
                 ADMIN PANEL
               </h1>
-              <p className="text-[11px] tracking-[0.16em] text-white/35">UPLOAD SERTIFIKASI</p>
+              <p className="text-[11px] tracking-[0.16em] text-white/35">
+                {mode === "supabase" ? "SUPABASE AUTH" : "UPLOAD SERTIFIKASI"}
+              </p>
             </div>
           </div>
           <form onSubmit={handleLogin} className="mt-8 space-y-4">
+            {mode === "supabase" && (
+              <div>
+                <label className={labelCls}>Email Admin</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@email.com"
+                  className={inputCls}
+                  autoFocus
+                />
+              </div>
+            )}
             <div>
               <label className={labelCls}>Password</label>
               <input
@@ -204,13 +393,13 @@ export default function AdminPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className={inputCls}
-                autoFocus
+                autoFocus={mode === "local"}
               />
             </div>
             {error && <p className="text-xs text-red-400">{error}</p>}
             <button
               type="submit"
-              disabled={busy || !password}
+              disabled={busy || !password || (mode === "supabase" && !email)}
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-white text-black h-11 text-[12px] tracking-[0.14em] font-semibold hover:bg-white/90 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               <Lock size={14} />
@@ -228,7 +417,7 @@ export default function AdminPage() {
         <div>
           <p className="text-[10px] tracking-[0.22em] text-white/30 font-medium">ADMIN DASHBOARD</p>
           <h1 className="font-display text-xl md:text-2xl font-bold tracking-[-0.03em] text-white mt-1">
-            Kelola Sertifikasi &amp; PDF
+            Kelola Sertifikat, Pengalaman &amp; Achievements
           </h1>
         </div>
         <div className="flex items-center gap-2">
@@ -247,18 +436,35 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl mt-8 flex flex-wrap gap-3">
+      {/* Tabs section */}
+      <div className="mx-auto max-w-6xl mt-8 flex flex-wrap gap-2">
+        {SECTION_KEYS.map((key) => (
+          <button
+            key={key}
+            onClick={() => switchSection(key)}
+            className={`inline-flex items-center rounded-full px-4 h-9 text-[11px] tracking-[0.12em] font-medium transition ${
+              active === key
+                ? "bg-white text-black"
+                : "border border-white/15 text-white/70 hover:bg-white/10"
+            }`}
+          >
+            {SECTIONS[key].label.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      <div className="mx-auto max-w-6xl mt-5 flex flex-wrap gap-3">
         <div className="rounded-2xl border border-white/[0.07] bg-surface px-5 py-3">
-          <p className="text-[10px] tracking-[0.16em] text-white/35">TOTAL</p>
-          <p className="font-display text-xl font-bold text-white mt-0.5">{list.length}</p>
+          <p className="text-[10px] tracking-[0.16em] text-white/35">TOTAL {def.label.toUpperCase()}</p>
+          <p className="font-display text-xl font-bold text-white mt-0.5">{items.length}</p>
         </div>
         <div className="rounded-2xl border border-white/[0.07] bg-surface px-5 py-3">
-          <p className="text-[10px] tracking-[0.16em] text-white/35">DENGAN PDF</p>
-          <p className="font-display text-xl font-bold text-white mt-0.5">{totalPdf}</p>
+          <p className="text-[10px] tracking-[0.16em] text-white/35">DENGAN FILE</p>
+          <p className="font-display text-xl font-bold text-white mt-0.5">{totalDocs}</p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl mt-8 grid lg:grid-cols-[360px_1fr] gap-6 items-start">
+      <div className="mx-auto max-w-6xl mt-8 grid lg:grid-cols-[380px_1fr] gap-6 items-start">
         {/* Form tambah */}
         <form
           onSubmit={handleAdd}
@@ -268,208 +474,166 @@ export default function AdminPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black">
               <Plus size={14} />
             </div>
-            <h2 className="font-display text-sm font-bold tracking-[-0.02em]">TAMBAH SERTIFIKAT</h2>
+            <h2 className="font-display text-sm font-bold tracking-[-0.02em]">
+              TAMBAH {def.label.toUpperCase()}
+            </h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Nomor</label>
               <input
-                value={form.number}
+                value={form.number ?? ""}
                 onChange={(e) => setForm({ ...form, number: e.target.value })}
-                placeholder="Auto"
-                className={inputCls}
-              />
-            </div>
-            <div className="col-span-2">
-              <label className={labelCls}>Tahun</label>
-              <input
-                value={form.year}
-                onChange={(e) => setForm({ ...form, year: e.target.value })}
-                placeholder="2026"
+                placeholder={nextNumberOf(items)}
                 className={inputCls}
               />
             </div>
           </div>
 
-          <div>
-            <label className={labelCls}>Judul</label>
-            <input
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Belajar Dasar Pemrograman Web"
-              className={inputCls}
-            />
-          </div>
-
-          <div>
-            <label className={labelCls}>Penerbit</label>
-            <input
-              value={form.issuer}
-              onChange={(e) => setForm({ ...form, issuer: e.target.value })}
-              placeholder="Dicoding Indonesia"
-              className={inputCls}
-            />
-          </div>
-
-          <div>
-            <label className={labelCls}>File PDF</label>
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 bg-white/[0.03] px-4 py-6 text-center hover:border-white/40 transition">
-              <Download size={18} className="text-white/60" />
-              <span className="text-xs text-white/60">
-                {file ? file.name : "Klik untuk pilih file PDF"}
-              </span>
-              <span className="text-[10px] tracking-wide text-white/30">maks. 20MB · .pdf</span>
-              <input
-                type="file"
-                accept="application/pdf,.pdf"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          {def.fields
+            .filter((f) => f.key !== "number")
+            .map((f) => (
+              <Field
+                key={f.key}
+                field={f}
+                value={form[f.key] ?? ""}
+                onChange={(key, value) => setForm({ ...form, [key]: value })}
               />
-            </label>
-            {file && (
-              <button
-                type="button"
-                onClick={() => setFile(null)}
-                className="mt-2 inline-flex items-center gap-1 text-[11px] text-white/40 hover:text-white"
-              >
-                <X size={12} /> Hapus pilihan file
-              </button>
-            )}
-          </div>
+            ))}
 
-          {form.number && form.number !== nextNumberOf(list) && (
-            <p className="text-[11px] text-white/40">Nomor sebelumnya: {nextNumberOf(list)}</p>
-          )}
+          <DocPicker
+            section={active}
+            file={file}
+            setFile={setFile}
+            docLabel={docLabel}
+            setDocLabel={setDocLabel}
+            manualHref={manualHref}
+            setManualHref={setManualHref}
+          />
 
           {error && <p className="text-xs text-red-400">{error}</p>}
 
           <button
             type="submit"
-            disabled={busy || !form.title || !form.issuer || !form.year}
+            disabled={busy}
             className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-white text-black h-11 text-[12px] tracking-[0.14em] font-semibold hover:bg-white/90 disabled:opacity-40 disabled:cursor-not-allowed transition"
           >
             <Plus size={14} />
-            {busy ? "MENYIMPAN…" : "SIMPAN SERTIFIKAT"}
+            {busy ? "MENYIMPAN…" : "SIMPAN"}
           </button>
         </form>
 
         {/* Daftar */}
         <div className="rounded-[20px] border border-white/[0.08] bg-surface divide-y divide-white/[0.06] overflow-hidden">
-          {list.length === 0 ? (
+          {items.length === 0 ? (
             <div className="p-10 text-center text-sm text-white/40">
-              Belum ada sertifikat. Tambahkan lewat form di samping.
+              Belum ada data. Tambahkan lewat form di samping.
             </div>
           ) : (
-            list.map((item) => {
-              const editing = editingId === item.number;
-              return (
-                <div key={item.number} className="px-5 md:px-6 py-4">
-                  {editing ? (
-                    <form
-                      onSubmit={(e) => handleSaveEdit(item.number, e)}
-                      className="space-y-3"
-                    >
+            items.map((item) => {
+              const id = text(item, "number");
+              const isEditing = editing === id;
+              const sum = summaryOf(active, item);
+              const href = docHref(active, item);
+
+              if (isEditing) {
+                return (
+                  <div key={id} className="px-5 md:px-6 py-4">
+                    <form onSubmit={(e) => handleSaveEdit(id, e)} className="space-y-3">
                       <div className="flex items-center justify-between">
                         <p className="text-[10px] tracking-[0.16em] text-white/35">
-                          EDIT · {item.number}
+                          EDIT · {def.singular.toUpperCase()} {id}
                         </p>
                         <button
                           type="button"
-                          onClick={() => setEditingId(null)}
+                          onClick={() => setEditing(null)}
                           className="text-white/40 hover:text-white"
                         >
                           <X size={15} />
                         </button>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className={labelCls}>Nomor</label>
-                          <input
-                            value={editForm.number}
-                            onChange={(e) => setEditForm({ ...editForm, number: e.target.value })}
-                            className={inputCls}
+                      {def.fields
+                        .filter((f) => f.key !== "number")
+                        .map((f) => (
+                          <Field
+                            key={f.key}
+                            field={f}
+                            value={editForm[f.key] ?? ""}
+                            onChange={(key, value) => setEditForm({ ...editForm, [key]: value })}
                           />
-                        </div>
-                        <div>
-                          <label className={labelCls}>Tahun</label>
+                        ))}
+                      <DocPicker
+                        section={active}
+                        file={editFile}
+                        setFile={setEditFile}
+                        docLabel={editDocLabel}
+                        setDocLabel={setEditDocLabel}
+                        manualHref={editManualHref}
+                        setManualHref={setEditManualHref}
+                      />
+                      {href && (
+                        <label className="flex items-center gap-2 text-xs text-white/60">
                           <input
-                            value={editForm.year}
-                            onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
-                            className={inputCls}
+                            type="checkbox"
+                            checked={removeDoc}
+                            onChange={(e) => setRemoveDoc(e.target.checked)}
+                            className="accent-white"
                           />
-                        </div>
-                      </div>
-                      <input
-                        value={editForm.title}
-                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                        placeholder="Judul"
-                        className={inputCls}
-                      />
-                      <input
-                        value={editForm.issuer}
-                        onChange={(e) => setEditForm({ ...editForm, issuer: e.target.value })}
-                        placeholder="Penerbit"
-                        className={inputCls}
-                      />
-                      <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-white/20 bg-white/[0.03] px-4 py-3 text-xs text-white/60 hover:border-white/40 transition">
-                        {editFile ? editFile.name : "Ganti file PDF (opsional)"}
-                        <input
-                          type="file"
-                          accept="application/pdf,.pdf"
-                          className="hidden"
-                          onChange={(e) => setEditFile(e.target.files?.[0] ?? null)}
-                        />
-                      </label>
-                      <div className="flex gap-2">
-                        <button
-                          type="submit"
-                          disabled={busy}
-                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-white text-black h-10 text-[11px] tracking-[0.12em] font-semibold hover:bg-white/90 disabled:opacity-40"
-                        >
-                          {busy ? "MENYIMPAN…" : "SIMPAN"}
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="flex items-center gap-4">
-                      <span className="font-display text-[12px] tracking-[0.18em] text-white/25 shrink-0">
-                        {item.number}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white font-medium truncate">{item.title}</p>
-                        <p className="text-[11px] tracking-[0.1em] text-white/35 mt-0.5">
-                          {item.issuer} · {item.year}
-                        </p>
-                      </div>
-                      {item.href && (
-                        <a
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/12 text-white/50 hover:text-white hover:border-white/40 transition"
-                          title="Buka PDF"
-                        >
-                          <ExternalLink size={13} />
-                        </a>
+                          Hapus file dokumen ini
+                        </label>
                       )}
                       <button
-                        onClick={() => startEdit(item)}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/12 text-white/50 hover:text-white hover:border-white/40 transition"
-                        title="Edit"
-                      >
-                        <Pencil size={13} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item)}
+                        type="submit"
                         disabled={busy}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-400/20 text-red-300/70 hover:text-red-300 hover:border-red-400/40 disabled:opacity-40 transition"
-                        title="Hapus"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white text-black h-10 text-[11px] tracking-[0.12em] font-semibold hover:bg-white/90 disabled:opacity-40"
                       >
-                        <Trash2 size={13} />
+                        {busy ? "MENYIMPAN…" : "SIMPAN PERUBAHAN"}
                       </button>
+                    </form>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={id} className="px-5 md:px-6 py-4">
+                  <div className="flex items-center gap-4">
+                    <span className="font-display text-[12px] tracking-[0.18em] text-white/25 shrink-0">
+                      {id}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white font-medium truncate">{sum.primary}</p>
+                      <p className="text-[11px] tracking-[0.1em] text-white/35 mt-0.5 truncate">
+                        {sum.secondary}
+                      </p>
                     </div>
-                  )}
+                    {href && (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/12 text-white/50 hover:text-white hover:border-white/40 transition"
+                        title="Buka file"
+                      >
+                        <ExternalLink size={13} />
+                      </a>
+                    )}
+                    <button
+                      onClick={() => startEdit(item)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/12 text-white/50 hover:text-white hover:border-white/40 transition"
+                      title="Edit"
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item)}
+                      disabled={busy}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-red-400/20 text-red-300/70 hover:text-red-300 hover:border-red-400/40 disabled:opacity-40 transition"
+                      title="Hapus"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
                 </div>
               );
             })
