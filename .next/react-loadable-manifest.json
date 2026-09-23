@@ -1,104 +1,104 @@
 {
   "components\\About.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\About.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Achievements.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Achievements.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\AnimatedBackground.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\AnimatedBackground.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Certifications.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Certifications.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Contact.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Contact.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Education.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Education.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Experience.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Experience.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Footer.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Footer.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Hero.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Hero.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\ProjectCard.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\ProjectCard.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\ScrollProgress.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\ScrollProgress.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\ScrollRevealFx.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\ScrollRevealFx.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\ScrollSectionFade.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\ScrollSectionFade.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Services.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Services.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\Skills.tsx -> gsap/ScrollTrigger": {
-    "id": 9498,
+    "id": "components\\Skills.tsx -> gsap/ScrollTrigger",
     "files": [
-      "static/chunks/84.e125f073022f44fa.js"
+      "static/chunks/_app-pages-browser_node_modules_gsap_ScrollTrigger_js.js"
     ]
   },
   "components\\SmoothScroll.tsx -> @studio-freight/lenis": {
-    "id": 9742,
+    "id": "components\\SmoothScroll.tsx -> @studio-freight/lenis",
     "files": [
-      "static/chunks/742.f81ac04bc1af11a8.js"
+      "static/chunks/_app-pages-browser_node_modules_studio-freight_lenis_dist_lenis_mjs.js"
     ]
   },
   "components\\SmoothScroll.tsx -> lenis": {
-    "id": 9096,
+    "id": "components\\SmoothScroll.tsx -> lenis",
     "files": [
-      "static/chunks/96.54f704930061cf6c.js"
+      "static/chunks/_app-pages-browser_node_modules_lenis_dist_lenis_mjs.js"
     ]
   }
 }
