@@ -1,8 +1,11 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/api/[section]/route": "app/api/[section]/route.js",
   "/admin/page": "app/admin/page.js",
+  "/page": "app/page.js",
+  "/api/admin/login/route": "app/api/admin/login/route.js",
+  "/api/[section]/[id]/route": "app/api/[section]/[id]/route.js",
+  "/api/[section]/route": "app/api/[section]/route.js",
+  "/api/admin/check/route": "app/api/admin/check/route.js",
   "/api/admin/config/route": "app/api/admin/config/route.js",
-  "/api/admin/check/route": "app/api/admin/check/route.js"
+  "/api/admin/logout/route": "app/api/admin/logout/route.js"
 }

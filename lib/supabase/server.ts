@@ -1,10 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { supabaseUrl } from "./config";
+import { supabaseAnonKey, supabaseUrl } from "./config";
 
 export function getRouteHandlerSupabase() {
   const url = supabaseUrl();
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const anonKey = supabaseAnonKey();
   if (!url || !anonKey) {
     throw new Error("Supabase belum dikonfigurasi. Cek .env");
   }

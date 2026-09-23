@@ -1,5 +1,5 @@
 import { isSupabaseConfigured, supabaseUrl } from "@/lib/supabase/config";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getRouteHandlerSupabase } from "@/lib/supabase/server";
 import { SECTIONS, type Section } from "@/lib/sections";
 import {
   normalizeName as localNormalizeName,
@@ -45,7 +45,7 @@ function fileNameFromUrl(href?: string) {
 
 export async function readItems(section: Section): Promise<Item[]> {
   if (isSupabaseConfigured()) {
-    const { data, error } = await getSupabaseAdmin()
+    const { data, error } = await getRouteHandlerSupabase()
       .from("portfolio_items")
       .select("data")
       .eq("section", section)
@@ -71,7 +71,7 @@ export async function uploadFile(section: Section, file: File): Promise<string> 
   if (isSupabaseConfigured()) {
     const fileName = `${section}-${Date.now()}-${name}`;
     const contentType = isPdf ? "application/pdf" : file.type || "image/*";
-    const { error } = await getSupabaseAdmin()
+    const { error } = await getRouteHandlerSupabase()
       .storage.from(BUCKET)
       .upload(fileName, file, { contentType, upsert: false });
     if (error) throw new Error(error.message || "Gagal mengunggah file ke Supabase Storage.");
@@ -86,7 +86,7 @@ export async function removeFile(section: Section, href?: string) {
   if (isSupabaseConfigured()) {
     const name = fileNameFromUrl(href);
     if (!name) return;
-    await getSupabaseAdmin().storage.from(BUCKET).remove([name]);
+    await getRouteHandlerSupabase().storage.from(BUCKET).remove([name]);
     return;
   }
   deleteFileLocal(section, href);
@@ -137,7 +137,7 @@ export async function createItem(section: Section, input: CreateInput): Promise<
       throw new Error("Unggah file PDF atau isi tautan dokumen.");
     }
 
-    const { error } = await getSupabaseAdmin().from("portfolio_items").insert({
+    const { error } = await getRouteHandlerSupabase().from("portfolio_items").insert({
       section,
       number: fields.number,
       data: item,
@@ -255,7 +255,7 @@ export async function updateItem(
   if (isSupabaseConfigured()) {
     let number = id;
     if (fields.number && fields.number !== id) {
-      const { data: dup } = await getSupabaseAdmin()
+      const { data: dup } = await getRouteHandlerSupabase()
         .from("portfolio_items")
         .select("number")
         .eq("section", section)
@@ -264,7 +264,7 @@ export async function updateItem(
       if (dup) throw new Error(`Nomor "${fields.number}" sudah digunakan.`);
       number = fields.number;
     }
-    const { error } = await getSupabaseAdmin()
+    const { error } = await getRouteHandlerSupabase()
       .from("portfolio_items")
       .update({ number, data: merged })
       .eq("section", section)
@@ -301,7 +301,7 @@ export async function deleteItem(section: Section, id: string): Promise<void> {
     : undefined;
 
   if (isSupabaseConfigured()) {
-    const { error } = await getSupabaseAdmin()
+    const { error } = await getRouteHandlerSupabase()
       .from("portfolio_items")
       .delete()
       .eq("section", section)

@@ -58,8 +58,16 @@ export function readLocal(section: Section): Record<string, unknown>[] {
 }
 
 export function persistLocal(section: Section, list: Record<string, unknown>[]) {
-  fs.mkdirSync(path.join(process.cwd(), "data"), { recursive: true });
-  fs.writeFileSync(jsonPath(section), JSON.stringify(list, null, 2) + "\n", "utf8");
+  try {
+    fs.mkdirSync(path.join(process.cwd(), "data"), { recursive: true });
+  } catch (err) {
+    throwLocalErrorIfReadOnly(err);
+  }
+  try {
+    fs.writeFileSync(jsonPath(section), JSON.stringify(list, null, 2) + "\n", "utf8");
+  } catch (err) {
+    throwLocalErrorIfReadOnly(err);
+  }
 
   const def = SECTIONS[section];
   const lines = list.map((c) => `  ${JSON.stringify(c)},`).join("\n");
@@ -70,7 +78,11 @@ export const ${def.exportName}: ${def.typeName}[] = [
 ${lines}
 ];
 `;
-  fs.writeFileSync(tsPath(section), ts, "utf8");
+  try {
+    fs.writeFileSync(tsPath(section), ts, "utf8");
+  } catch (err) {
+    throwLocalErrorIfReadOnly(err);
+  }
 }
 
 export function nextNumber(section: Section, list: Record<string, unknown>[]) {
@@ -121,7 +133,11 @@ export async function saveFileLocal(section: Section, file: File): Promise<strin
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  fs.writeFileSync(path.join(folder, finalName), buffer);
+  try {
+    fs.writeFileSync(path.join(folder, finalName), buffer);
+  } catch (err) {
+    throwLocalErrorIfReadOnly(err);
+  }
   return `/${SECTIONS[section].folder}/${finalName}`;
 }
 
@@ -137,4 +153,16 @@ export function deleteFileLocal(section: Section, href?: string) {
   } catch {
     // abaikan jika gagal menghapus
   }
+}
+
+const READONLY_CODES = new Set(["EROFS", "EACCES", "EPERM", "ENOSPC", "ENOTDIR"]);
+
+function throwLocalErrorIfReadOnly(err: unknown) {
+  const code = (err as NodeJS.ErrnoException)?.code;
+  if (code && READONLY_CODES.has(code)) {
+    throw new Error(
+      "Server tidak mengizinkan penulisan file lokal. Mode Supabase belum aktif: pastikan NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY terpasang di Vercel, lalu deploy ulang."
+    );
+  }
+  throw err;
 }
