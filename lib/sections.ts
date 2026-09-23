@@ -9,6 +9,8 @@ export interface SectionDef {
   exportName: string;
   fields: Array<{ key: string; label: string }>;
   hasCertificate: boolean;
+  /** apakah section menerima upload file (PDF / gambar). default: true */
+  hasFile?: boolean;
 }
 
 export const SECTIONS = {
@@ -28,6 +30,7 @@ export const SECTIONS = {
       { key: "year", label: "Tahun" },
     ],
     hasCertificate: false,
+    hasFile: true,
   },
   experience: {
     label: "Pengalaman",
@@ -44,9 +47,10 @@ export const SECTIONS = {
       { key: "company", label: "Perusahaan" },
       { key: "location", label: "Lokasi" },
       { key: "role", label: "Posisi" },
-      { key: "description", label: "Deskripsi" },
+{ key: "description", label: "Deskripsi" },
     ],
     hasCertificate: true,
+    hasFile: true,
   },
   achievements: {
     label: "Achievements",
@@ -62,9 +66,31 @@ export const SECTIONS = {
       { key: "title", label: "Judul" },
       { key: "event", label: "Event" },
       { key: "year", label: "Tahun" },
-      { key: "tag", label: "Tag" },
+{ key: "tag", label: "Tag" },
     ],
     hasCertificate: true,
+    hasFile: true,
+  },
+projects: {
+    label: "Selected Work",
+    singular: "Project",
+    format: "pdf",
+    folder: "projects",
+    jsonFile: "data/projects.json",
+    tsFile: "data/projects.ts",
+    typeName: "Project",
+    exportName: "projects",
+    fields: [
+      { key: "number", label: "Nomor" },
+      { key: "name", label: "Nama" },
+      { key: "category", label: "Kategori" },
+      { key: "tech", label: "Teknologi" },
+      { key: "description", label: "Deskripsi" },
+      { key: "href", label: "Tautan Project" },
+      { key: "year", label: "Tahun" },
+    ],
+    hasCertificate: false,
+    hasFile: false,
   },
 } as const satisfies Record<string, SectionDef>;
 

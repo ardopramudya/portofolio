@@ -33,6 +33,15 @@ const INTERFACES: Record<Section, string> = {
     label: string;
   };
 }`,
+  projects: `export interface Project {
+  number: string;
+  name: string;
+  category: string;
+  tech: string;
+  description: string;
+  href: string;
+  year: string;
+}`,
 };
 
 function jsonPath(section: Section) {

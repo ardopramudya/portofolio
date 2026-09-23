@@ -54,6 +54,11 @@ function summaryOf(section: Section, item: Item) {
         primary: text(item, "title"),
         secondary: `${text(item, "tag")} · ${text(item, "event")} · ${text(item, "year")}`,
       };
+    case "projects":
+      return {
+        primary: text(item, "name"),
+        secondary: `${text(item, "category")} · ${text(item, "year")}`,
+      };
   }
 }
 
@@ -502,15 +507,17 @@ export default function AdminPage() {
               />
             ))}
 
-          <DocPicker
-            section={active}
-            file={file}
-            setFile={setFile}
-            docLabel={docLabel}
-            setDocLabel={setDocLabel}
-            manualHref={manualHref}
-            setManualHref={setManualHref}
-          />
+          {def.hasFile !== false && (
+            <DocPicker
+              section={active}
+              file={file}
+              setFile={setFile}
+              docLabel={docLabel}
+              setDocLabel={setDocLabel}
+              manualHref={manualHref}
+              setManualHref={setManualHref}
+            />
+          )}
 
           {error && <p className="text-xs text-red-400">{error}</p>}
 
@@ -563,15 +570,17 @@ export default function AdminPage() {
                             onChange={(key, value) => setEditForm({ ...editForm, [key]: value })}
                           />
                         ))}
-                      <DocPicker
-                        section={active}
-                        file={editFile}
-                        setFile={setEditFile}
-                        docLabel={editDocLabel}
-                        setDocLabel={setEditDocLabel}
-                        manualHref={editManualHref}
-                        setManualHref={setEditManualHref}
-                      />
+                      {def.hasFile !== false && (
+                        <DocPicker
+                          section={active}
+                          file={editFile}
+                          setFile={setEditFile}
+                          docLabel={editDocLabel}
+                          setDocLabel={setEditDocLabel}
+                          manualHref={editManualHref}
+                          setManualHref={setEditManualHref}
+                        />
+                      )}
                       {href && (
                         <label className="flex items-center gap-2 text-xs text-white/60">
                           <input

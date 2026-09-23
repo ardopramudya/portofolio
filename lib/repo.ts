@@ -130,8 +130,9 @@ export async function createItem(section: Section, input: CreateInput): Promise<
       } else {
         item = { ...fields, href: input.manualHref.trim() };
       }
-    } else if (def.hasCertificate) {
-      // dokumen tidak wajib untuk experience/achievements
+    } else if (def.hasCertificate || def.hasFile === false) {
+      // dokumen tidak wajib untuk experience/achievements,
+      // dan projects bisa tanpa file (hanya field teks)
       item = { ...fields };
     } else {
       throw new Error("Unggah file PDF atau isi tautan dokumen.");
@@ -178,7 +179,7 @@ export async function createItem(section: Section, input: CreateInput): Promise<
     } else {
       item = { ...fields, href: input.manualHref.trim() };
     }
-  } else if (def.hasCertificate) {
+  } else if (def.hasCertificate || def.hasFile === false) {
     item = { ...fields };
   } else {
     throw new Error("Unggah file PDF atau isi tautan dokumen.");
